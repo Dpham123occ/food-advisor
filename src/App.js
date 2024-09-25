@@ -1,51 +1,6 @@
-import logo from './logo.svg';
+import React, { useState } from 'react';
 import './App.css';
 
-document.addEventListener("DOMContentLoaded", () => {
-  const userAnswers = {};
-
-  // Store the user answer for each question
-  function saveAnswer(question, answer) {
-    userAnswers[question] = answer;
-  }
-
-  function calculateResult() {
-    const combination = [
-      userAnswers["What type of food are you feeling?"],
-      userAnswers["How broke are you?"],
-      userAnswers["What do you imagine now?"],
-      userAnswers["What time of day?"],
-      userAnswers["What’s the atmosphere?"],
-    ].join(", ");
-
-    const result =
-      results[combination] || "No match found, maybe try something new today!";
-    displayResult(result);
-  }
-
-  function displayResult(result) {
-    const resultContainer = document.getElementById("result");
-    resultContainer.innerHTML = `<h2>Your Food Match: ${result}</h2>`;
-  }
-
-  document.querySelectorAll(".question1-options button").forEach((button) => {
-    button.addEventListener("click", () => {
-      saveAnswer("What type of food are you feeling?", button.innerText);
-    });
-  });
-
-  document.querySelectorAll(".question2-options button").forEach((button) => {
-    button.addEventListener("click", () => {
-      saveAnswer("How broke are you?", button.innerText);
-    });
-  });
-
-  document
-    .querySelector("#submitQuiz")
-    .addEventListener("click", calculateResult);
-});
-
-//add comment
 const questions = [
   {
     question: "What kind of mood are you in?",
@@ -137,51 +92,63 @@ const results = {
     "Indian Butter Chicken",
 };
 
-let currentQuestion = 0;
-let answers = [];
-
-function displayQuestion() {
-  const quizDiv = document.getElementById("quiz");
-  quizDiv.innerHTML = `<h2>${questions[currentQuestion].question}</h2>`;
-
-  questions[currentQuestion].options.forEach((option) => {
-    const button = document.createElement("button");
-    button.innerText = option;
-    button.onclick = () => selectAnswer(option);
-    quizDiv.appendChild(button);
-  });
+function Question({ question, options, onSelect }) {
+  return (
+    <div>
+      <h2>{question}</h2>
+      {options.map((option) => (
+        <button key={option} onClick={() => onSelect(option)}>
+          {option}
+        </button>
+      ))}
+    </div>
+  );
 }
 
-function selectAnswer(option) {
-  answers.push(option);
-  currentQuestion++;
-  if (currentQuestion < questions.length) {
-    displayQuestion();
-  } else {
-    showResult();
-  }
+function Quiz() {
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [answers, setAnswers] = useState([]);
+
+  const selectAnswer = (option) => {
+    setAnswers([...answers, option]);
+    if (currentQuestion < questions.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+    } else {
+      showResult();
+    }
+  };
+
+  const showResult = () => {
+    const key = answers.join(", ");
+    const result = results[key] || "a mix of flavors!";
+    document.getElementById("result").innerText = `You are feeling like: ${result}`;
+  };
+
+  return (
+    <div>
+      {currentQuestion < questions.length ? (
+        <Question
+          question={questions[currentQuestion].question}
+          options={questions[currentQuestion].options}
+          onSelect={selectAnswer}
+        />
+      ) : (
+        <div id="result"></div>
+      )}
+      <button id="nextButton" onClick={() => setCurrentQuestion(currentQuestion + 1)}>
+        Next
+      </button>
+    </div>
+  );
 }
-
-function showResult() {
-  const resultDiv = document.getElementById("result");
-  const key = answers.join(", ");
-  resultDiv.innerText = `You are feeling like: ${
-    results[key] || "a mix of flavors!"
-  }`;
-}
-
-document.getElementById("nextButton").onclick = displayQuestion;
-
-displayQuestion();
 
 function App() {
   return (
     <div className="App">
-      <div class="container">
+      <div className="container">
         <h1>What Type of Food Are You Feeling?</h1>
-        <div id="quiz"></div>
-        <button id="nextButton">Next</button>
-        <div id="result" class="result"></div>
+        <Quiz />
+        <div id="result" className="result"></div>
       </div>
     </div>
   );
