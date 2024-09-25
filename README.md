@@ -1,3 +1,7 @@
+# Instruction on how to install React
+
+refer to this [guide](https://www.freecodecamp.org/news/how-to-install-react-a-step-by-step-guide/) to set up React in order to start the website
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
